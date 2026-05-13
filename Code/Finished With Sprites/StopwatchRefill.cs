@@ -38,6 +38,7 @@ namespace Celeste.Mod.JackalHelper.Entities
 
 		private bool oneUse;
 		private bool refillDash;
+		private bool resetState;
 		public float recallTime;
 		// COLOURSOFNOISE: This needs to be implemented in Ahorn
 		private bool storeFollowers;
@@ -48,11 +49,12 @@ namespace Celeste.Mod.JackalHelper.Entities
 
 		public float recallTimer = 0f;
 
-		public StopwatchRefill(Vector2 position, bool oneUse, bool refillDash, float time, bool storeFollowers)
+		public StopwatchRefill(Vector2 position, bool oneUse, bool refillDash, float time, bool storeFollowers, bool resetState)
 			: base(position)
 		{
 			this.refillDash = refillDash;
 			recallTime = time;
+			this.resetState = resetState;
 			this.oneUse = oneUse;
 			this.storeFollowers = storeFollowers;
 
@@ -94,7 +96,7 @@ namespace Celeste.Mod.JackalHelper.Entities
 		}
 
 		public StopwatchRefill(EntityData data, Vector2 offset)
-			: this(data.Position + offset, data.Bool("oneUse"), data.Bool("RefillDashOnUse", defaultValue: true), data.Float("time"), data.Bool("storeFollowers"))
+			: this(data.Position + offset, data.Bool("oneUse"), data.Bool("RefillDashOnUse", defaultValue: true), data.Float("time"), data.Bool("storeFollowers"), data.Bool("resetState"))
 		{
 		}
 
@@ -128,8 +130,8 @@ namespace Celeste.Mod.JackalHelper.Entities
 						MoveFollowers(player.Leader, (Position + new Vector2(0f, 8f)) - player.Position);
 
 					player.Position = (Position + new Vector2(0f, 8f));
-					//Optional: reset state
-					player.StateMachine.State = 0;
+					if (resetState) player.StateMachine.State = 0;
+					if (oneUse) RemoveSelf();
 				}
 				timed = false;
 				recallTimer = 0f;
